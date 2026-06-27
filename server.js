@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const app = require('./src/app');
 const { connectDB } = require('./src/config/db');
-const { connectRedis, getRedisClient } = require('./src/config/redis');
+// const { connectRedis, getRedisClient } = require('./src/config/redis');
 
 dotenv.config();
 
@@ -18,12 +18,12 @@ const gracefulShutdown = async (signal) => {
     await mongoose.disconnect();
     console.log('🔴 MongoDB disconnected');
 
-    // Close Redis connection
-    const redisClient = getRedisClient();
-    if (redisClient) {
-      await redisClient.quit();
-      console.log('🔴 Redis disconnected');
-    }
+    // // Close Redis connection
+    // const redisClient = getRedisClient();
+    // if (redisClient) {
+    //   await redisClient.quit();
+    //   console.log('🔴 Redis disconnected');
+    // }
 
     process.exit(0);
   } catch (error) {
@@ -38,9 +38,9 @@ const gracefulShutdown = async (signal) => {
     await connectDB();
     console.log('✅ MongoDB connected');
 
-    // Connect to Redis
-    await connectRedis();
-    console.log('✅ Redis connected');
+    // // Connect to Redis
+    // await connectRedis();
+    // console.log('✅ Redis connected');
 
     // Start Express server
     const server = app.listen(PORT, () => {
