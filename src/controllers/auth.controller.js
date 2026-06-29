@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 
 const User = require('../models/User');
+const { sendResetEmail } = require('../services/email.service');
 
 dotenv.config();
 
@@ -94,4 +96,87 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login };
+// @desc    Forgot password - send reset link
+// @route   POST /api/v1/auth/forgpt-password
+// @access  Public
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ error: { code: 'MISSING_EMAIL', message: 'Email is required' } });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // For security, don't reveal if email exists
+      return res.status(200).json({ message: 'If that email exists, we have sent a reset link' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save({ validateBeforeSave: false });
+
+    // Build reset link (frontend URL)
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+    // Send email
+    await sendResetEmail(user.email, resetLink);
+
+    res.status(200).json({ message: 'If that email exists, we have sent a reset link.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset password with token
+// @route   POST /api/v1/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        error: { code: 'MISSING_FIELDS', message: 'Token and new password are required' },
+      });
+    }
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    }).select('+resetPasswordToken +resetPasswordExpires');
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: { code: 'INVALID_TOKEN', message: 'Invalid or expired token' } });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    // Log the user in (return new token)
+    const jwtToken = generateToken(user);
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(200).json({
+      message: 'Password reset successful',
+      token: jwtToken,
+      user: userResponse,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, forgotPassword, resetPassword };

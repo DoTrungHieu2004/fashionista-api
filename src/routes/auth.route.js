@@ -8,5 +8,7 @@ const validatorAuth = require('../validations/auth.validation');
 // Public routes
 router.post('/register', validator(validatorAuth.registerSchema), authCtrl.register);
 router.post('/login', validator(validatorAuth.loginSchema), authCtrl.login);
+router.post('/forgot-password', authCtrl.forgotPassword);
+router.post('/reset-password', authCtrl.resetPassword);
 
 module.exports = router;
