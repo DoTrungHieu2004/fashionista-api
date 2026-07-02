@@ -43,6 +43,9 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// Image uploads
+app.use('/uploads', express.static('uploads'));
+
 // ---------- Routes ----------
 
 app.use('/api/v1', routes);
