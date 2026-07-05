@@ -8,6 +8,7 @@ const healthCtrl = require('../controllers/health.controller');
 const authRoutes = require('../routes/auth.route');
 const userRoutes = require('../routes/user.route');
 const categoryRoutes = require('../routes/category.route');
+const brandRoutes = require('../routes/brand.route');
 
 // Health & status
 router.get('/health', healthCtrl.check);
@@ -16,5 +17,6 @@ router.get('/health', healthCtrl.check);
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/categories', categoryRoutes);
+router.use('/brands', brandRoutes);
 
 module.exports = router;

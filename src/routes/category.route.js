@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const upload = require('../middleware/upload');
+const createUpload = require('../middleware/upload');
 const { authenticate, authorize } = require('../middleware/auth');
 const categoryCtrl = require('../controllers/category.controller');
 const validator = require('../middleware/validator');
 const validatorCategory = require('../validations/category.validation');
+
+const upload = createUpload('uploads/categories');
 
 // Public routes (no auth)
 router.get('/', categoryCtrl.getCategories);
