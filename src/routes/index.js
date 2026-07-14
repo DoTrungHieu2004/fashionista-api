@@ -9,6 +9,7 @@ const authRoutes = require('../routes/auth.route');
 const userRoutes = require('../routes/user.route');
 const categoryRoutes = require('../routes/category.route');
 const brandRoutes = require('../routes/brand.route');
+const productRoutes = require('../routes/product.route');
 
 // Health & status
 router.get('/health', healthCtrl.check);
@@ -18,5 +19,6 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/brands', brandRoutes);
+router.use('/products', productRoutes);
 
 module.exports = router;
