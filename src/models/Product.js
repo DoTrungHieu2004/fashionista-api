@@ -38,6 +38,7 @@ const productSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     status: {
       type: String,
+      required: true,
       enum: ['DRAFT', 'ACTIVE', 'OUT_OF_STOCK', 'ARCHIVED'],
       default: 'DRAFT',
     },
@@ -49,6 +50,12 @@ const productSchema = new mongoose.Schema(
           position: { type: Number, default: 0 },
         },
       ],
+      validate: {
+        validator: function (v) {
+          return Array.isArray(v) && v.length > 0;
+        },
+        message: 'Product must have at least one image',
+      },
       default: [],
     },
     averageRating: { type: Number, min: 0, max: 5, default: 0 },

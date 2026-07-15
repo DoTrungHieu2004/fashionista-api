@@ -4,6 +4,7 @@ const path = require('path');
 const Product = require('../models/Product');
 const Brand = require('../models/Brand');
 const Category = require('../models/Category');
+const ProductVariant = require('../models/ProductVariant');
 
 // Helper to validate brand and categories existence
 const validateReferences = async (brandId, categoryIds) => {
@@ -56,7 +57,32 @@ const getProducts = async (req, res, next) => {
       searchFilter = { $text: { $search: search } };
     }
 
+    // Price filter: used to find productIDs with variants in price range
+    let priceFilteredId = null;
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      const priceQuery = {};
+      if (minPrice !== undefined) priceQuery.price = { $gte: parseFloat(minPrice) };
+      if (maxPrice !== undefined) {
+        if (priceQuery.price) priceQuery.price.$lte = parseFloat(maxPrice);
+        else priceQuery.price = { $lte: parseFloat(maxPrice) };
+      }
+      // Get distinct productIds from variants matching price range
+      const variants = await ProductVariant.distinct('productId', priceQuery);
+      if (variants.length === 0) {
+        // No products match price range, return empty
+        return res.status(200).json({
+          products: [],
+          pagination: { page: parseInt(page), limit: parseInt(limit), total: 0, pages: 0 },
+        });
+      }
+      priceFilteredId = variants;
+    }
+
+    // Combine filters
     const query = { ...filter, ...searchFilter };
+    if (priceFilteredId) {
+      query._id = { $in: priceFilteredId };
+    }
 
     // Pagination
     const skip = (page - 1) * limit;
@@ -119,6 +145,13 @@ const createProduct = async (req, res, next) => {
 
     // Validate references
     await validateReferences(brandId, categoryIds);
+
+    // Check images
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        error: { code: 'MISSING_IMAGES', message: 'At least one product image is required' },
+      });
+    }
 
     // Handle images
     const images = [];

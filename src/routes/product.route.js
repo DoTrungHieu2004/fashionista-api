@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const productVariantRoutes = require('./product-variant.route');
+const variantRoutes = require('./variant.route');
 const { authenticate, authorize } = require('../middleware/auth');
 const createUpload = require('../middleware/upload');
 const productCtrl = require('../controllers/product.controller');
@@ -33,5 +35,11 @@ router.put(
 );
 
 router.delete('/:id', authenticate, authorize('STAFF', 'ADMIN'), productCtrl.deleteProduct);
+
+// Nested variant routes under a product
+router.use('/:productId/variants', productVariantRoutes);
+
+// Single variant operations (top-level)
+router.use('/variants', variantRoutes);
 
 module.exports = router;
