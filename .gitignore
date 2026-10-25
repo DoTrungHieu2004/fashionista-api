@@ -1,0 +1,53 @@
+# ---------- Node & package managers ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+.npm
+.yarn/cache
+.yarn/install-state.gz
+.pnpm-store/
+
+# ---------- Environment & secrets ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------- Build output ----------
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+
+# ---------- Logs ----------
+logs/
+*.log
+pino-*.log
+
+# ---------- Editors & OS ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---------- Test artifacts ----------
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# ---------- NLP model artifacts (future AI module) ----------
+models/*.nlp
+!models/.gitkeep
+model.nlp
+
+# ---------- Firebase & MongoDB local artifacts (future) ----------
+.firebase/
+mongo-data/

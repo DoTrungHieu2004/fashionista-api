@@ -1,0 +1,50 @@
+# ---------- Node & package managers ----------
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+
+# ---------- Build & generated output ----------
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+*.tsbuildinfo
+
+# ---------- Lockfiles ----------
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ---------- Environment & secrets ----------
+.env
+.env.*
+!.env.example
+secrets/
+
+# ---------- Logs ----------
+logs/
+*.log
+
+# ---------- Editors & OS ----------
+.vscode/
+.idea/
+.DS_Store
+
+# ---------- Static assets & binaries ----------
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.webp
+*.mp4
+*.pdf
+
+# ---------- NLP models & data dumps ----------
+models/
+*.nlp
+seeds/
+fixtures/
