@@ -7,6 +7,7 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 
 const env = require('./config/env');
+const { initFirebaseAdmin } = require('./config/firebase.admin');
 const logger = require('./logging/logger');
 const requestLogger = require('./middlewares/request-logger.middleware');
 const notFoundHandler = require('./middlewares/not-found.middleware');
@@ -31,6 +32,8 @@ app.use(compression());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(requestLogger);
+
+initFirebaseAdmin();
 
 // Baseline rate limit - tighter limits will be added per route later.
 app.use(
