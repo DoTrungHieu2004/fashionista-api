@@ -43,6 +43,13 @@ const env = {
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL || null,
     privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n') || null,
   },
+
+  // ---- MongoDB ----
+  mongo: {
+    uri: process.env.MONGODB_URI || null,
+    dbName: process.env.MONGODB_DB_NAME || null,
+    maxPoolSize: toInt(process.env.MONGODB_MAX_POOL_SIZE, 10),
+  },
 };
 
 module.exports = env;

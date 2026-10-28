@@ -4,18 +4,28 @@ const http = require('http');
 
 const app = require('./app');
 const env = require('./config/env');
+const { disconnectMongo, connectMongo } = require('./config/mongo.client');
 const logger = require('./logging/logger');
 
 const server = http.createServer(app);
 
-server.listen(env.port, () => {
-  logger.info({ port: env.port, env: env.nodeEnv }, 'Fashionista API listening');
+const start = async () => {
+  try {
+    await connectMongo();
+  } catch (error) {
+    logger.error({ error }, 'Failed to connect to MongoDB — aborting startup');
+    process.exit(1);
+  }
 
-  console.log('\x1b[36m%s\x1b[0m', '==================================================');
-  console.log('\x1b[32m%s\x1b[0m', ' 🚀 Fashionista API is live and running successfully!');
-  console.log(` 🌐 Local URL: \x1b[4m\x1b[35mhttp://localhost:${env.port}\x1b[0m`);
-  console.log('\x1b[36m%s\x1b[0m', '==================================================');
-});
+  server.listen(env.port, () => {
+    logger.info({ port: env.port, env: env.nodeEnv }, 'Fashionista API listening');
+
+    console.log('\x1b[36m%s\x1b[0m', '==================================================');
+    console.log('\x1b[32m%s\x1b[0m', ' 🚀 Fashionista API is live and running successfully!');
+    console.log(` 🌐 Local URL: \x1b[4m\x1b[35mhttp://localhost:${env.port}\x1b[0m`);
+    console.log('\x1b[36m%s\x1b[0m', '==================================================');
+  });
+};
 
 let shuttingDown = false;
 
@@ -30,13 +40,18 @@ const shutdown = (signal) => {
   }, 10_000);
   forceTimer.unref();
 
-  server.close((err) => {
+  server.close(async (err) => {
     clearTimeout(forceTimer);
     if (err) {
       logger.error({ err }, 'Error during server shutdown');
       process.exit(1);
     }
     logger.info('HTTP server closed');
+    try {
+      await disconnectMongo();
+    } catch (disconnectErr) {
+      logger.error({ err: disconnectErr }, 'Error closing MongoDB');
+    }
     process.exit(0);
   });
 };
@@ -51,3 +66,5 @@ process.on('uncaughtException', (err) => {
   logger.error({ err }, 'Uncaught exception');
   shutdown('uncaughtException');
 });
+
+start();

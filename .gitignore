@@ -51,6 +51,16 @@ model.nlp
 # ---------- Firebase & MongoDB local artifacts (future) ----------
 .firebase/
 mongo-data/
+mongodump-*/
+mongorestore-*/
+*.bson
+
+# Firebase service account keys
+service-account*.json
+firebase-adminsdk-*.json
+*-firebase-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
 
 # ---------- Environment & secrets ----------
 .env
@@ -59,10 +69,3 @@ mongo-data/
 *.pem
 *.key
 secrets/
-
-# Firebase service account keys
-service-account*.json
-firebase-adminsdk-*.json
-*-firebase-adminsdk-*.json
-google-services.json
-GoogleService-Info.plist

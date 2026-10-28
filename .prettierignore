@@ -57,7 +57,7 @@ fixtures/
 *.key
 secrets/
 
-# Firebase service account keys
+# ---------- Firebase service account keys ----------
 service-account*.json
 firebase-adminsdk-*.json
 *-firebase-adminsdk-*.json
